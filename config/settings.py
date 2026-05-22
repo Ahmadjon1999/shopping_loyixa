@@ -17,6 +17,11 @@ ALLOWED_HOSTS = env.list('ALLOWED_HOST')
 AUTH_USER_MODEL = 'app_one.User'
 
 
+CSRF_TRUSTED_ORIGINS = ['https://onlineshoppingproject-production.up.railway.app']
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+
 # Application definition
 
 INSTALLED_APPS = [
