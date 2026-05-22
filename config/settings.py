@@ -8,9 +8,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 env = Env()
 env.read_env()
 
-DEBUG         = env.bool('DEBUG', False)
+DEBUG = env.bool('DEBUG', False)
 
-SECRET_KEY    = env.str('SECRET_KEY')
+SECRET_KEY = env.str('SECRET_KEY')
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOST')
 # AUTH_USER_MODEL = 'app_one.CustomUser'
