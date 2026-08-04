@@ -77,7 +77,6 @@ def user_logout(request):
     return redirect("login")
 
 
-
 def register(request):
     if request.user.is_authenticated:
         return redirect("index")
@@ -86,11 +85,14 @@ def register(request):
         first_name = request.POST.get("first_name")
         last_name = request.POST.get("last_name")
         phone_number = request.POST.get("phone_number")
+        email = request.POST.get("email")  # Yangi
+        address = request.POST.get("address")  # Yangi
+        profile_image = request.FILES.get("profile_image")  # Faylni olish uchun request.FILES ishlatiladi
         password1 = request.POST.get("password1")
         password2 = request.POST.get("password2")
 
         if not first_name or not last_name or not phone_number or not password1 or not password2:
-            messages.error("Barcha soxalar to'ldirilishi shart")
+            messages.error(request, "Barcha majburiy soxalar to'ldirilishi shart")  # request qo'shildi
             return redirect("register")
 
         if password2 == password1:
@@ -100,10 +102,15 @@ def register(request):
                 if user_exists:
                     messages.error(request, "Bunday foydalanuvchi mavjud")
                     return redirect("register")
+
+                # Yangi maydonlar bilan birga foydalanuvchi yaratish
                 user = User.objects.create(
                     first_name=first_name,
                     last_name=last_name,
                     phone_number=phone_number,
+                    email=email if email else None,
+                    address=address if address else None,
+                    profile_image=profile_image if profile_image else None,
                 )
                 user.set_password(raw_password=password2)
                 user.save()
@@ -111,7 +118,7 @@ def register(request):
                 return redirect("login")
 
             else:
-                messages.error(request,"Parol 8 ta belgidan kam")
+                messages.error(request, "Parol 8 ta belgidan kam")
 
 
         else:

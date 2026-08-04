@@ -84,7 +84,7 @@ else:
           'USER': env.str('DB_USER'),
           'HOST': env.str('DB_HOST', default='db'),
           'PORT': env.int('DB_PORT', default=5432),
-          'PASSWORD': env.str('PASSWORD'),
+          'PASSWORD': env.str('DB_PASSWORD'),
       }
   }
 
