@@ -158,42 +158,59 @@
 </div>
 
 
-
 <script>
-    // Elementlarni tanlab olamiz
     const minusBtn = document.getElementById('minus-btn');
     const plusBtn = document.getElementById('plus-btn');
     const quantityInput = document.getElementById('quantity-input');
 
-    // Plus tugmasi bosilganda
+    // Sahifa yuklanganda avval saqlangan qiymatni tekshiramiz (agar bo'lsa)
+    const savedQuantity = localStorage.getItem('product_quantity');
+    if (savedQuantity) {
+        quantityInput.value = savedQuantity;
+    }
+
+    // Plus
     plusBtn.addEventListener('click', () => {
-        let currentValue = parseInt(quantityInput.value);
+        let currentValue = parseInt(quantityInput.value) || 1;
         quantityInput.value = currentValue + 1;
+        localStorage.setItem('product_quantity', quantityInput.value); // Xotiraga saqlaymiz
     });
 
-    // Minus tugmasi bosilganda
+    // Minus
     minusBtn.addEventListener('click', () => {
-        let currentValue = parseInt(quantityInput.value);
-        // Miqdor 1 dan kamayib ketmasligi uchun tekshiruv
+        let currentValue = parseInt(quantityInput.value) || 1;
         if (currentValue > 1) {
             quantityInput.value = currentValue - 1;
+            localStorage.setItem('product_quantity', quantityInput.value); // Xotiraga saqlaymiz
         }
+    });
+
+    // Foydalanuvchi o'zi qo'lda yozsa ham saqlanishi uchun
+    quantityInput.addEventListener('input', () => {
+        localStorage.setItem('product_quantity', quantityInput.value);
     });
 </script>
 
 {% if messages %}
     <script>
         {% for message in messages %}
+            // Xabar turiga qarab ranglarni aniqlaymiz
+            {% if message.tags == 'error' %}
+                var swalColor = "#ef4444"; // Qizil rang (xato uchun)
+            {% else %}
+                var swalColor = "#22c55e"; // Yashil rang (success yoki boshqalar uchun)
+            {% endif %}
+
             Swal.fire({
-                position: "center",      // Oynani o'rtada chiqarish
-                icon: "{{ message.tags }}", // success, error, info
+                position: "center",
+                icon: "{{ message.tags }}", // success, error
                 title: "{{ message }}",
-                showConfirmButton: false, // Tasdiqlash tugmasini yashirish
-                timer: 2000,             // 2000 millisekund = 2 soniya
-                timerProgressBar: true,  // Pastida vaqt ketayotganini ko'rsatuvchi chiziq
-                background: "#1a1a1a",   // To'q fon
-                color: "#22c55e",        // Yashil matn
-                iconColor: "#22c55e"     // Yashil belgi
+                showConfirmButton: false,
+                timer: 2000,
+                timerProgressBar: true,
+                background: "#1a1a1a",
+                color: swalColor,       // Dinamik rang (xatoda qizil, muvaffaqiyatda yashil)
+                iconColor: swalColor    // Belgining rangi ham moslashadi
             });
         {% endfor %}
     </script>

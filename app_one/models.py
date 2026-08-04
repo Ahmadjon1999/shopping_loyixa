@@ -61,7 +61,7 @@ class Product(models.Model):
     name        = models.CharField(verbose_name="Maxsulot nomi", max_length=100)
     price       = models.DecimalField(verbose_name="Maxsulot narxi", max_digits=12, decimal_places=2)
     image       = models.ImageField(verbose_name="Maxsulot Surati", upload_to="products/")
-    in_stock    = models.IntegerField(verbose_name="Ombordagi soni", default=1)
+    in_stock    = models.PositiveIntegerField(verbose_name="Ombordagi soni", default=1)
     category    = models.ForeignKey(verbose_name="Maxsulot Kategoryasi", to=Category, on_delete=models.PROTECT)
     description = models.TextField(verbose_name="Maxsulot Tavsifi", null=True, blank=True)
 
@@ -95,7 +95,6 @@ class Cart(models.Model):
 
 
 class Transaction(models.Model):
-    id = models.UUIDField(verbose_name="ID", primary_key=True, unique=True, editable=False, default=uuid4)
     user = models.ForeignKey(verbose_name="Foydalanuvchi", to=User, on_delete=models.CASCADE)
     product_name = models.CharField(verbose_name="Maxsulot nomi", max_length=255)
     amount = models.DecimalField(verbose_name="Sariflangan pul miqdori", max_digits=12, decimal_places=2)

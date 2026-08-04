@@ -1,6 +1,7 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
+
 
 
 from app_one.models import Product,User, Cart, Transaction
@@ -123,31 +124,50 @@ def register(request):
 
 
 def prod_detail(request, product_id):
-    product = Product.objects.get(id=product_id)
+  product = get_object_or_404(Product, id=product_id)
 
-    if request.method == "POST":
-        quantity = request.POST.get("quantity")
+  if request.method == "POST":
+    try:
+      quantity = int(request.POST.get("quantity", 1))
+    except ValueError:
+      quantity = 1
 
-        try:
-            cart_obj = Cart.objects.get(user=request.user, product=product )
-        except:
-            cart_obj = None
+    if quantity > product.in_stock:
+      messages.error(
+          request, f"Kechirasiz, omborda faqat {product.in_stock} ta mavjud."
+      )
+      return render(request, "prod_detail.html", {"product": product})
 
-        if cart_obj is None:
-            Cart.objects.create(
-                user=request.user,
-                product=product,
-                count=quantity,
-            )
-            messages.success(request, "Maxsulot savatchaga muvaffaqiyatli qoshildi")
-        else:
-            cart_obj.count += int(quantity)
-            cart_obj.save()
-            messages.success(request, "Savatchadagi maxsulot soni o'zgartirildi")
-    data = {
-        "product":product
-    }
-    return render(request, template_name='prod_detail.html', context=data)
+    try:
+      cart_obj = Cart.objects.get(user=request.user, product=product)
+    except Cart.DoesNotExist:
+      cart_obj = None
+
+    if cart_obj is None:
+
+      Cart.objects.create(
+          user=request.user,
+          product=product,
+          count=quantity,
+      )
+
+      product.in_stock -= quantity
+      product.save()
+
+      messages.success(request, "Maxsulot savatchaga muvaffaqiyatli qoshildi")
+    else:
+
+      cart_obj.count += quantity
+      cart_obj.save()
+
+
+      product.in_stock -= quantity
+      product.save()
+
+      messages.success(request, "Savatchadagi maxsulot soni o'zgartirildi")
+
+  data = {"product": product}
+  return render(request, template_name="prod_detail.html", context=data)
 
 
 def profile_info(request):
@@ -185,11 +205,18 @@ def cart(request):
 
 
 def delete_product(request, product_id):
-    product = Cart.objects.filter(id=product_id, user=request.user)
-    if product:
-        product.delete()
-        return redirect("cart")
-    return redirect("cart")
+
+  cart_item = Cart.objects.filter(id=product_id, user=request.user).first()
+
+  if cart_item:
+    product = cart_item.product
+    product.in_stock += cart_item.count
+    product.save()
+
+
+    cart_item.delete()
+
+  return redirect("cart")
 
 
 

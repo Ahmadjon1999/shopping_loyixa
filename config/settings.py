@@ -12,7 +12,7 @@ DEBUG = env.bool('DEBUG', False)
 
 SECRET_KEY = env.str('SECRET_KEY')
 
-ALLOWED_HOSTS = env.list('ALLOWED_HOST')
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
 # AUTH_USER_MODEL = 'app_one.CustomUser'
 AUTH_USER_MODEL = 'app_one.User'
 
@@ -39,6 +39,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -68,25 +69,24 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
-
 if DEBUG:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME'  : BASE_DIR / 'db.sqlite3',
-        }
-    }
+  DATABASES = {
+      'default': {
+          'ENGINE': 'django.db.backends.sqlite3',
+          'NAME': BASE_DIR / 'db.sqlite3',
+      }
+  }
 else:
-    DATABASES = {
-        'default': {
-            'ENGINE'  :'django.db.backends.postgresql',
-            'DB_NAME' : env.str('DB_NAME'),
-            'DB_USER' : env.str('DB_USER'),
-            'DB_HOST' : env.str("DB_HOST"),
-            'DB_PORT' : env.int('DB_PORT'),
-            'PASSWORD': env.str('PASSWORD')
-        }
-    }
+  DATABASES = {
+      'default': {
+          'ENGINE': 'django.db.backends.postgresql',
+          'NAME': env.str('DB_NAME'),
+          'USER': env.str('DB_USER'),
+          'HOST': env.str('DB_HOST', default='db'),
+          'PORT': env.int('DB_PORT', default=5432),
+          'PASSWORD': env.str('PASSWORD'),
+      }
+  }
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
